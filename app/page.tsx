@@ -90,8 +90,12 @@ export default function Page() {
         const data = await response.json();
         setExchangeRates(data.rates);
         setLastUpdated(new Date().toLocaleTimeString());
-      }catch (error: any) {
-        toast.error(`Failed to fetch exchange rates: ${error.message}`);
+      }catch (error: unknown) {
+        if (error instanceof Error) {
+          toast.error(`Fetch failed: ${error.message}`);
+        } else {
+          toast.error('An unknown error occurred');
+        }
       } finally {
         setLoading(false);
       }
