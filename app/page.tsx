@@ -206,21 +206,21 @@ export default function Page() {
                     </div>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left">
+                <SheetContent side="left" className="p-6">
                   <SheetHeader>
                     <SheetTitle>Select From Currency</SheetTitle>
                     <SheetDescription>Choose the currency you want to convert from.</SheetDescription>
                   </SheetHeader>
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <input
                       type="text"
                       placeholder="Search currencies..."
                       value={fromSearch}
                       onChange={(e) => setFromSearch(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
                     />
                   </div>
-                  <div className="max-h-[calc(100vh-280px)] overflow-y-auto space-y-2">
+                  <div className="max-h-[calc(100vh-320px)] overflow-y-auto space-y-3">
                     {filteredFromCurrencies.map(currency => (
                       <div
                         key={currency.code}
@@ -295,21 +295,21 @@ export default function Page() {
                     </div>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className='p-2'>
+                <SheetContent side="left" className="p-6">
                   <SheetHeader>
                     <SheetTitle>Select To Currency</SheetTitle>
                     <SheetDescription>Choose the currency you want to convert to.</SheetDescription>
                   </SheetHeader>
-                  <div className="mt-4">
+                  <div className="mt-6">
                     <input
                       type="text"
                       placeholder="Search currencies..."
                       value={toSearch}
                       onChange={(e) => setToSearch(e.target.value)}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
                     />
                   </div>
-                  <div className="max-h-[calc(100vh-280px)] overflow-y-auto space-y-2">
+                  <div className="max-h-[calc(100vh-320px)] overflow-y-auto space-y-3">
                     {filteredToCurrencies.map(currency => (
                       <div
                         key={currency.code}
