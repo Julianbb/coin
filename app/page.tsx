@@ -79,21 +79,24 @@ export default function Page() {
     localStorage.setItem('favoriteCurrencies', JSON.stringify(favoriteCurrencies));
   }, [favoriteCurrencies]);
 
-  const fetchExchangeRates = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
-      const data = await response.json();
-      setExchangeRates(data.rates);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      toast.error('Failed to fetch exchange rates');
-    } finally {
-      setLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
+
+    const fetchExchangeRates = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
+        const data = await response.json();
+        setExchangeRates(data.rates);
+        setLastUpdated(new Date().toLocaleTimeString());
+      }catch (error: any) {
+        toast.error(`Failed to fetch exchange rates: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchExchangeRates();
   }, [fromCurrency]);
 
