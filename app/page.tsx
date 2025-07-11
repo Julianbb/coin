@@ -295,7 +295,7 @@ export default function Page() {
                     </div>
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left">
+                <SheetContent side="left" className='p-2'>
                   <SheetHeader>
                     <SheetTitle>Select To Currency</SheetTitle>
                     <SheetDescription>Choose the currency you want to convert to.</SheetDescription>
