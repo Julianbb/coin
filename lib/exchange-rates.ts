@@ -14,6 +14,7 @@ class ExchangeRateService {
   private cache: CacheEntry | null = null;
   private readonly CACHE_DURATION = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
   private readonly API_BASE_URL = 'https://api.exchangeratesapi.io/v1/latest';
+  private readonly CACHE_KEY = 'exchange_rates_cache';
   
   private async fetchExchangeRates(): Promise<ExchangeRateData> {
     const apiKey = process.env.NEXT_PUBLIC_RATE_API_KEY;
@@ -42,7 +43,32 @@ class ExchangeRateService {
     };
   }
 
+  private loadCacheFromStorage(): void {
+    try {
+      const stored = localStorage.getItem(this.CACHE_KEY);
+      if (stored) {
+        this.cache = JSON.parse(stored);
+      }
+    } catch (error) {
+      console.warn('Failed to load cache from localStorage:', error);
+    }
+  }
+
+  private saveCacheToStorage(): void {
+    try {
+      if (this.cache) {
+        localStorage.setItem(this.CACHE_KEY, JSON.stringify(this.cache));
+      }
+    } catch (error) {
+      console.warn('Failed to save cache to localStorage:', error);
+    }
+  }
+
   private isCacheValid(): boolean {
+    if (!this.cache) {
+      this.loadCacheFromStorage();
+    }
+    
     if (!this.cache) return false;
     
     const now = Date.now();
@@ -62,6 +88,7 @@ class ExchangeRateService {
         data,
         lastUpdated: Date.now()
       };
+      this.saveCacheToStorage();
       return data;
     } catch (error) {
       // If fetch fails and we have cached data, return it
@@ -116,6 +143,10 @@ class ExchangeRateService {
   }
 
   getCacheInfo(): { isValid: boolean; lastUpdated: number | null; nextUpdate: number | null } {
+    if (!this.cache) {
+      this.loadCacheFromStorage();
+    }
+    
     if (!this.cache) {
       return { isValid: false, lastUpdated: null, nextUpdate: null };
     }
