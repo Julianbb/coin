@@ -11,10 +11,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { exchangeRateService } from '@/lib/exchange-rates';
 
-interface ExchangeRates {
-  [key: string]: number;
-}
 
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
@@ -53,11 +51,10 @@ const CURRENCIES = [
 ];
 
 export default function Page() {
-  const [fromCurrency, setFromCurrency] = useState('USD');
-  const [toCurrency, setToCurrency] = useState('EUR');
+  const [fromCurrency, setFromCurrency] = useState('EUR');
+  const [toCurrency, setToCurrency] = useState('USD');
   const [amount, setAmount] = useState('');
   const [convertedAmount, setConvertedAmount] = useState('');
-  const [exchangeRates, setExchangeRates] = useState<ExchangeRates>({});
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [fromSheetOpen, setFromSheetOpen] = useState(false);
@@ -82,15 +79,12 @@ export default function Page() {
   
 
   useEffect(() => {
-
     const fetchExchangeRates = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${fromCurrency}`);
-        const data = await response.json();
-        setExchangeRates(data.rates);
-        setLastUpdated(new Date().toLocaleTimeString());
-      }catch (error: unknown) {
+        const data = await exchangeRateService.getExchangeRates();
+        setLastUpdated(new Date(data.timestamp).toLocaleTimeString());
+      } catch (error: unknown) {
         if (error instanceof Error) {
           toast.error(`Fetch failed: ${error.message}`);
         } else {
@@ -104,14 +98,6 @@ export default function Page() {
     fetchExchangeRates();
   }, [fromCurrency]);
 
-  useEffect(() => {
-    if (amount && exchangeRates[toCurrency]) {
-      const result = (parseFloat(amount) * exchangeRates[toCurrency]).toFixed(2);
-      setConvertedAmount(result);
-    } else {
-      setConvertedAmount('');
-    }
-  }, [amount, toCurrency, exchangeRates]);
 
   const handleNumberInput = (num: string) => {
     if (num === '.' && amount.includes('.')) return;
@@ -135,7 +121,32 @@ export default function Page() {
     setAmount(convertedAmount);
   };
 
-  const currentRate = exchangeRates[toCurrency] || 0;
+  const [currentRate, setCurrentRate] = useState(0);
+
+  useEffect(() => {
+    const updateRateAndConvert = async () => {
+      if (fromCurrency && toCurrency) {
+        try {
+          const rate = await exchangeRateService.convertCurrency(1, fromCurrency, toCurrency);
+          setCurrentRate(rate);
+          
+          // Convert amount if present
+          if (amount && parseFloat(amount) > 0) {
+            const result = rate * parseFloat(amount);
+            setConvertedAmount(result.toFixed(2));
+          } else {
+            setConvertedAmount('');
+          }
+        } catch (error) {
+          console.error('Conversion error:', error);
+          setCurrentRate(0);
+          setConvertedAmount('');
+        }
+      }
+    };
+
+    updateRateAndConvert();
+  }, [amount, fromCurrency, toCurrency]);
 
   const toggleFavorite = (currencyCode: string) => {
     setFavoriteCurrencies(prev =>
