@@ -63,11 +63,20 @@ export default function Page() {
   const [toSearch, setToSearch] = useState('');
   const [favoriteCurrencies, setFavoriteCurrencies] = useState<string[]>([]);
 
-  // Load favorites from localStorage on component mount
+  // Load saved data from localStorage on component mount
   useEffect(() => {
     const savedFavorites = localStorage.getItem('favoriteCurrencies');
     if (savedFavorites) {
       setFavoriteCurrencies(JSON.parse(savedFavorites));
+    }
+
+    const savedFromCurrency = localStorage.getItem('fromCurrency');
+    const savedToCurrency = localStorage.getItem('toCurrency');
+    if (savedFromCurrency) {
+      setFromCurrency(savedFromCurrency);
+    }
+    if (savedToCurrency) {
+      setToCurrency(savedToCurrency);
     }
   }, []);
 
@@ -75,6 +84,15 @@ export default function Page() {
   useEffect(() => {
     localStorage.setItem('favoriteCurrencies', JSON.stringify(favoriteCurrencies));
   }, [favoriteCurrencies]);
+
+  // Save currency selections to localStorage
+  useEffect(() => {
+    localStorage.setItem('fromCurrency', fromCurrency);
+  }, [fromCurrency]);
+
+  useEffect(() => {
+    localStorage.setItem('toCurrency', toCurrency);
+  }, [toCurrency]);
 
   
 
