@@ -14,6 +14,14 @@ import {
 import { exchangeRateService } from '@/lib/exchange-rates';
 
 
+const formatNumber = (num: string | number): string => {
+  if (!num || num === '') return '0';
+  const numStr = typeof num === 'number' ? num.toString() : num;
+  const [integer, decimal] = numStr.split('.');
+  const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return decimal ? `${formattedInteger}.${decimal}` : formattedInteger;
+};
+
 const CURRENCIES = [
   { code: 'USD', name: 'US Dollar', symbol: '$', flag: '🇺🇸' },
   { code: 'EUR', name: 'Euro', symbol: '€', flag: '🇪🇺' },
@@ -197,23 +205,19 @@ export default function Page() {
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">Currency Converter</h1>
-          <div className="text-sm text-gray-600">
-            {loading ? (
-              <span>Updating rates...</span>
-            ) : (
-              <span>Last updated: {lastUpdated}</span>
-            )}
-          </div>
-        </div>
 
         {/* Currency Selection */}
         <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
           {/* Exchange Rate Display */}
           <div className="text-center mb-4">
-            <div className="text-sm text-gray-600 mb-1">Exchange Rate</div>
+            <div className="text-sm text-gray-600 mb-1">
+              Exchange Rate
+              {loading ? (
+                <span className="ml-2">• Updating rates...</span>
+              ) : (
+                <span className="ml-2">• Last updated: {lastUpdated}</span>
+              )}
+            </div>
             <div className="text-lg font-semibold text-gray-800">
               1 {fromCurrency} = {currentRate.toFixed(4)} {toCurrency}
             </div>
@@ -394,13 +398,13 @@ export default function Page() {
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Amount ({fromCurrency})</label>
               <div className="text-3xl font-bold text-gray-800 min-h-[1.5em] p-2 bg-gray-50 rounded-lg">
-                {amount || '0'}
+                {formatNumber(amount)}
               </div>
             </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-gray-700 mb-2">Converted ({toCurrency})</label>
               <div className="text-3xl font-bold text-blue-600 min-h-[1.5em] p-2 bg-blue-50 rounded-lg">
-                {convertedAmount || '0'}
+                {formatNumber(convertedAmount)}
               </div>
             </div>
           </div>
